@@ -9,9 +9,11 @@
             const colourArray = [];
             var canvas = document.getElementById('canvas');
             var sortedCanvas = document.getElementById('sortedCanvas');
+            var liveSortedCanvas = document.getElementById('liveSortedCanvas');
             if (canvas.getContext) {
                 var ctx = canvas.getContext('2d');
-                var ctx2 = sortedCanvas.getContext('2d');
+                var ctx1 = sortedCanvas.getContext('2d');
+                var ctx2 = liveSortedCanvas.getContext('2d');
                 for (var x = 0; x < 400;) {
                     for (var y = 0; y < 400;) {
 
@@ -27,34 +29,28 @@
                 }
                 var sortedRgbArr = colourArray.map(function (c, i) {
                     // Convert to HSL and keep track of original indices
+                    var x = Math.floor((5 * i) / 400);
+                    var y = (i * 5) - x * 400;
+                    ctx2.fillStyle = 'rgb(' + rgbToHsl(c) + ')';
+                    ctx2.fillRect(x * 5, y, 5, 5);
                     return { color: rgbToHsl(c), index: i };
                 }).sort(function (c1, c2) {
                     // Sort by hue
+
+
                     return c1.color[0] - c2.color[0];
                 }).map(function (data) {
                     // Retrieve original RGB color
                     return colourArray[data.index];
                 });
-                console.log(sortedRgbArr);
-
-                for (var x = 0; x < 400;) {
-                    for (var i = 0; i <= sortedRgbArr.length; i++) {
-                        for (var y = 0; y < 400;) {
-
-                            ctx2.fillStyle = 'rgb(' + sortedRgbArr[i] + ')';
-                            ctx2.fillRect(x, y, 5, 5);
-                            var p = ctx2.getImageData(x, y, 1, 1).data;
-                            colourArray.push(p);
-
-                            y = y + 5;
-                            i++;
-                        }
-                        x = x + 5;
-                    }
-                }
+            }
+            for (var i = 0; i <= sortedRgbArr.length; i++) {
+                var x = Math.floor((5 * i) / 400);
+                var y = (i * 5) - x * 400;
+                ctx1.fillStyle = 'rgb(' + sortedRgbArr[i] + ')';
+                ctx1.fillRect(x * 5, y, 5, 5);
 
             }
-
         }
         function rgbToHsl(c) {
             var r = c[0] / 255, g = c[1] / 255, b = c[2] / 255;
@@ -82,6 +78,7 @@
 <body onload="draw();">
     <canvas id="canvas" width="400" height="400"></canvas>
     <canvas id="sortedCanvas" width="400" height="400"></canvas>
+    <canvas id="liveSortedCanvas" width="400" height="400"></canvas>
 </body>
 
 </html>
